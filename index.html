@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartStock 360</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="menu">
+      <div class="logo">
+        <strong>SmartStock 360</strong>
+        <span>Controle de validade</span>
+      </div>
+
+      <button class="menu-btn ativo" data-view="dashboard">Início</button>
+      <button class="menu-btn" data-view="produtos">Produtos</button>
+      <button class="menu-btn" data-view="lotes">Lotes e validades</button>
+      <button class="menu-btn" data-view="saida">Registrar saída</button>
+      <button class="menu-btn" data-view="importar">Importar vendas</button>
+      <button class="menu-btn" data-view="historico">Histórico</button>
+
+      <p class="projeto">Projeto Integrador II</p>
+    </aside>
+
+    <main class="principal">
+      <header class="cabecalho">
+        <div>
+          <h1 id="pageTitle">Início</h1>
+          <p id="pageSubtitle">Visão geral do estoque e das validades</p>
+        </div>
+        <button id="refreshBtn" class="botao botao-claro">Atualizar</button>
+      </header>
+
+      <div id="alertBox" class="mensagem oculto"></div>
+
+      <section id="view-dashboard" class="view ativo">
+        <div class="resumo">
+          <div class="resumo-item">
+            <span>Produtos ativos</span>
+            <b id="mProdutos">0</b>
+          </div>
+          <div class="resumo-item">
+            <span>Unidades em estoque</span>
+            <b id="mUnidades">0</b>
+          </div>
+          <div class="resumo-item vermelho">
+            <span>Lotes vencidos</span>
+            <b id="mVencidos">0</b>
+          </div>
+          <div class="resumo-item amarelo">
+            <span>Vencem em até 30 dias</span>
+            <b id="mProximos">0</b>
+          </div>
+        </div>
+
+        <div class="grade-dashboard">
+          <div class="bloco">
+            <div class="linha-titulo">
+              <div>
+                <h2>Validades prioritárias</h2>
+                <p class="texto-apoio">Lotes com estoque, ordenados pela data de validade.</p>
+              </div>
+            </div>
+            <div class="tabela-area">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Lote</th>
+                    <th>Validade</th>
+                    <th>Qtd.</th>
+                    <th>Situação</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bloco lateral-dashboard">
+            <h2>Atenção</h2>
+            <div id="alertasResumo" class="lista-alertas"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-produtos" class="view">
+        <div class="duas-colunas produtos-layout">
+          <div class="bloco">
+            <h2 id="produtoFormTitulo">Cadastrar produto</h2>
+            <form id="produtoForm" class="formulario">
+              <input id="produtoId" type="hidden">
+              <label>
+                Nome do produto
+                <input id="produtoNome" maxlength="120" placeholder="Ex.: Leite Integral 1L" required>
+              </label>
+              <label>
+                Código de barras
+                <input id="produtoCodigo" maxlength="40" inputmode="numeric" placeholder="Ex.: 7891234567890" required>
+              </label>
+              <label>
+                Categoria
+                <input id="produtoCategoria" maxlength="80" placeholder="Ex.: Laticínios" required>
+              </label>
+              <div class="acoes-form">
+                <button class="botao botao-verde" type="submit" id="produtoSalvarBtn">Salvar produto</button>
+                <button class="botao botao-secundario oculto" type="button" id="produtoCancelarBtn">Cancelar edição</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bloco">
+            <div class="linha-titulo responsiva">
+              <div>
+                <h2>Produtos cadastrados</h2>
+                <p class="texto-apoio">Produtos arquivados permanecem no histórico.</p>
+              </div>
+              <select id="filtroProdutoStatus" class="filtro">
+                <option value="ativos">Ativos</option>
+                <option value="todos">Todos</option>
+                <option value="arquivados">Arquivados</option>
+              </select>
+            </div>
+            <input id="buscaProduto" class="busca" placeholder="Buscar por nome, código ou categoria">
+            <div class="tabela-area">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Código</th>
+                    <th>Categoria</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="produtosRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-lotes" class="view">
+        <div class="duas-colunas lotes-layout">
+          <div class="bloco">
+            <h2>Cadastrar lote</h2>
+            <form id="loteForm" class="formulario">
+              <label>
+                Produto
+                <select id="loteProduto" required>
+                  <option value="">Selecione...</option>
+                </select>
+              </label>
+              <label>
+                Número do lote
+                <input id="loteNumero" maxlength="50" placeholder="Ex.: L240901" required>
+              </label>
+              <label>
+                Data de validade
+                <input id="loteValidade" type="date" required>
+              </label>
+              <label>
+                Quantidade inicial
+                <input id="loteQuantidade" type="number" min="1" step="1" placeholder="Ex.: 24" required>
+              </label>
+              <button class="botao botao-verde" type="submit">Salvar lote</button>
+            </form>
+          </div>
+
+          <div class="bloco">
+            <div class="linha-titulo responsiva">
+              <div>
+                <h2>Consultar validades</h2>
+                <p class="texto-apoio">Edite dados do lote ou ajuste o estoque quando necessário.</p>
+              </div>
+              <select id="filtroStatus" class="filtro">
+                <option value="todos">Todos</option>
+                <option value="vencido">Vencidos</option>
+                <option value="critico">Até 7 dias</option>
+                <option value="proximo">Até 30 dias</option>
+                <option value="ok">Dentro da validade</option>
+                <option value="zerado">Sem estoque</option>
+              </select>
+            </div>
+            <input id="buscaLote" class="busca" placeholder="Buscar produto ou lote">
+            <div class="tabela-area">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Lote</th>
+                    <th>Validade</th>
+                    <th>Qtd.</th>
+                    <th>Situação</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="lotesRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-saida" class="view">
+        <div class="duas-colunas">
+          <div class="bloco">
+            <h2>Registrar saída</h2>
+            <form id="saidaForm" class="formulario">
+              <label>
+                Produto
+                <select id="saidaProduto" required>
+                  <option value="">Selecione...</option>
+                </select>
+              </label>
+              <div id="saidaEstoqueInfo" class="info-estoque">Selecione um produto para consultar o estoque.</div>
+              <label>
+                Quantidade
+                <input id="saidaQuantidade" type="number" min="1" step="1" placeholder="Ex.: 3" required>
+              </label>
+              <button class="botao botao-verde" type="submit">Registrar saída</button>
+            </form>
+            <p class="observacao">A baixa segue FEFO: primeiro o lote com a validade mais próxima.</p>
+          </div>
+
+          <div class="bloco">
+            <h2>Últimas movimentações</h2>
+            <div class="tabela-area">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Produto</th>
+                    <th>Lote</th>
+                    <th>Tipo</th>
+                    <th>Qtd.</th>
+                  </tr>
+                </thead>
+                <tbody id="movRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-importar" class="view">
+        <div class="duas-colunas importar-layout">
+          <div class="bloco">
+            <h2>Importar vendas</h2>
+            <p class="texto-apoio">Use um CSV exportado pelo sistema do mercado. O arquivo deve ter código de barras e quantidade.</p>
+            <div class="formulario">
+              <label>
+                Arquivo CSV
+                <input id="csvArquivo" type="file" accept=".csv,text/csv">
+              </label>
+              <button id="baixarModeloCsv" class="botao botao-secundario" type="button">Baixar modelo CSV</button>
+            </div>
+            <div class="observacao">
+              Colunas aceitas: <b>codigo_barras</b> e <b>quantidade</b>. Também são aceitos <b>codigo</b>, <b>ean</b> e <b>qtd</b>.
+            </div>
+          </div>
+
+          <div class="bloco">
+            <div class="linha-titulo responsiva">
+              <div>
+                <h2>Prévia da importação</h2>
+                <p id="csvResumo" class="texto-apoio">Nenhum arquivo selecionado.</p>
+              </div>
+              <button id="processarCsvBtn" class="botao botao-verde" type="button" disabled>Processar vendas válidas</button>
+            </div>
+            <div class="tabela-area">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Linha</th>
+                    <th>Código</th>
+                    <th>Produto</th>
+                    <th>Qtd.</th>
+                    <th>Estoque</th>
+                    <th>Validação</th>
+                  </tr>
+                </thead>
+                <tbody id="csvRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-historico" class="view">
+        <div class="bloco">
+          <div class="linha-titulo responsiva">
+            <div>
+              <h2>Histórico de movimentações</h2>
+              <p class="texto-apoio">Consulte entradas, saídas e ajustes realizados no estoque.</p>
+            </div>
+            <button id="exportarHistoricoBtn" class="botao botao-secundario" type="button">Exportar CSV</button>
+          </div>
+          <div class="filtros-historico">
+            <input id="historicoBusca" class="busca" placeholder="Buscar produto, lote ou tipo">
+            <select id="historicoTipo" class="filtro">
+              <option value="todos">Todos os tipos</option>
+              <option value="ENTRADA">Entradas</option>
+              <option value="SAIDA">Saídas</option>
+            </select>
+            <input id="historicoInicio" class="filtro" type="date" aria-label="Data inicial">
+            <input id="historicoFim" class="filtro" type="date" aria-label="Data final">
+          </div>
+          <div class="tabela-area">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Produto</th>
+                  <th>Lote</th>
+                  <th>Tipo</th>
+                  <th>Qtd.</th>
+                </tr>
+              </thead>
+              <tbody id="historicoRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modalLote" class="modal oculto">
+    <div class="modal-conteudo">
+      <div class="modal-topo">
+        <div>
+          <h2 id="modalLoteTitulo">Editar lote</h2>
+          <p id="modalLoteSubtitulo" class="texto-apoio"></p>
+        </div>
+        <button class="modal-fechar" type="button" data-fechar-modal="modalLote">×</button>
+      </div>
+      <form id="editarLoteForm" class="formulario">
+        <input id="editarLoteId" type="hidden">
+        <label>
+          Número do lote
+          <input id="editarLoteNumero" maxlength="50" required>
+        </label>
+        <label>
+          Data de validade
+          <input id="editarLoteValidade" type="date" required>
+        </label>
+        <button class="botao botao-verde" type="submit">Salvar alterações</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalAjuste" class="modal oculto">
+    <div class="modal-conteudo">
+      <div class="modal-topo">
+        <div>
+          <h2>Ajustar estoque</h2>
+          <p id="modalAjusteSubtitulo" class="texto-apoio"></p>
+        </div>
+        <button class="modal-fechar" type="button" data-fechar-modal="modalAjuste">×</button>
+      </div>
+      <form id="ajusteForm" class="formulario">
+        <input id="ajusteLoteId" type="hidden">
+        <label>
+          Nova quantidade em estoque
+          <input id="ajusteQuantidade" type="number" min="0" step="1" required>
+        </label>
+        <button class="botao botao-verde" type="submit">Confirmar ajuste</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
