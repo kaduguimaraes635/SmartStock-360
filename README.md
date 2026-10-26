@@ -1,72 +1,85 @@
 # SmartStock 360
 
-Sistema web desenvolvido para o Projeto Integrador II com foco no controle de validade e estoque por lote em pequenos mercados.
+Sistema desenvolvido para o Projeto Integrador II com foco no controle de validade, lotes e movimentação de estoque em pequenos mercados.
+
+O objetivo do projeto é facilitar o acompanhamento de produtos próximos do vencimento, reduzir perdas e tornar o controle de estoque mais organizado e eficiente.
 
 ## Funcionalidades
 
 - Cadastro e edição de produtos
-- Arquivamento e reativação de produtos sem perder o histórico
+- Arquivamento e reativação de produtos
 - Cadastro de lotes com quantidade e data de validade
-- Classificação automática de lotes vencidos, críticos e próximos do vencimento
-- Ajuste de estoque com registro da movimentação
-- Saída manual utilizando FEFO
-- Importação de vendas por CSV com validação de código de barras e estoque
-- Histórico de entradas e saídas com filtros
-- Exportação do histórico em CSV
-- Dashboard com indicadores e alertas de validade
-- Persistência dos dados no Supabase/PostgreSQL
+- Consulta de produtos por validade
+- Classificação automática de produtos vencidos, próximos do vencimento e dentro da validade
+- Ajuste de estoque
+- Registro de entradas e saídas
+- Baixa automática utilizando a regra FEFO
+- Histórico de movimentações
+- Filtros de movimentação
+- Exportação de histórico em CSV
+- Importação de vendas por arquivo CSV
+- Baixa automática de estoque a partir das vendas importadas
+- Dashboard com resumo do estoque e alertas de validade
 
-## Tecnologias
+## Regra FEFO
+
+O sistema utiliza a regra FEFO — First Expired, First Out.
+
+Isso significa que, ao registrar uma saída, o sistema utiliza primeiro o lote com a data de validade mais próxima.
+
+Caso a quantidade de um lote não seja suficiente, o sistema continua automaticamente no próximo lote disponível.
+
+## Importação de vendas
+
+O SmartStock 360 já possui uma funcionalidade de importação de vendas por arquivo CSV.
+
+O arquivo utiliza o código de barras do produto e a quantidade vendida. Após a importação, o sistema identifica o produto e realiza a baixa automática no estoque seguindo a regra FEFO.
+
+Essa funcionalidade foi desenvolvida como uma etapa inicial para uma futura integração com o sistema de vendas utilizado pelo mercado.
+
+## Banco de dados
+
+O projeto utiliza o Supabase como banco de dados.
+
+As principais informações armazenadas são:
+
+- Produtos
+- Lotes
+- Quantidades
+- Datas de validade
+- Entradas
+- Saídas
+- Ajustes de estoque
+- Histórico de movimentações
+
+## Tecnologias utilizadas
 
 - HTML
 - CSS
 - JavaScript
 - Supabase
 - PostgreSQL
+- Git
+- GitHub
 
-## Configuração
+## Status do projeto
 
-1. Crie um projeto no Supabase.
-2. Abra o SQL Editor e execute `supabase.sql`.
-3. Copie `config.example.js` para `config.js`.
-4. Preencha `config.js` com a URL e a chave pública do projeto Supabase.
-5. Abra `index.html` no navegador.
+O sistema está em desenvolvimento e já possui os principais fluxos funcionais.
 
-Exemplo de configuração:
+Atualmente, o SmartStock 360 permite cadastrar e gerenciar produtos e lotes, controlar validade, registrar movimentações de estoque e importar vendas por CSV.
 
-```js
-window.SMARTSTOCK_CONFIG = {
-  supabaseUrl: 'COLE_AQUI_A_URL',
-  supabaseAnonKey: 'COLE_AQUI_A_CHAVE_PUBLICA'
-};
-```
+## Próximas melhorias
 
-O arquivo `config.js` está ignorado pelo Git para evitar publicar a configuração local do projeto.
+Entre as melhorias previstas estão:
 
-## Importação de vendas
+- integração direta com o sistema utilizado pelo mercado;
+- automatização da importação das vendas;
+- melhorias de interface e usabilidade;
+- alertas automáticos de produtos próximos do vencimento;
+- relatórios mais completos;
+- melhorias para tornar o processo de conferência e movimentação de estoque mais rápido.
 
-O CSV deve conter uma coluna de código de barras e outra de quantidade. Exemplo:
 
-```csv
-codigo_barras;quantidade
-7891234567890;2
-7899876543210;1
-```
+## Projeto
 
-Também são reconhecidos os cabeçalhos `codigo`, `ean`, `qtd` e `qtde`.
-
-Antes de processar o arquivo, o sistema mostra uma prévia e verifica se o produto existe e se há estoque suficiente. As vendas válidas são baixadas seguindo FEFO.
-
-## Regra FEFO
-
-FEFO significa First Expire, First Out. Quando uma saída é registrada, o sistema utiliza primeiro o lote com a data de validade mais próxima.
-
-## Estrutura do banco
-
-- `produtos`: catálogo dos produtos
-- `lotes`: lotes, quantidades e validades
-- `movimentacoes`: histórico de entradas e saídas
-
-## Projeto acadêmico
-
-O SmartStock 360 é um protótipo acadêmico em evolução. A proposta é reduzir o controle manual de validade e permitir, posteriormente, integração mais direta com dados de venda do sistema utilizado pelo estabelecimento.
+Projeto Integrador II — Engenharia de Software
