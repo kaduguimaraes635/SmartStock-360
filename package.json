@@ -1,0 +1,28 @@
+{
+  "name": "smartstock360-v2",
+  "version": "1.0.0",
+  "description": "Sistema desenvolvido para o Projeto Integrador II com foco no controle de validade, lotes e movimentação de estoque em pequenos mercados.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaduguimaraes635/SmartStock-360.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kaduguimaraes635/SmartStock-360/issues"
+  },
+  "homepage": "https://github.com/kaduguimaraes635/SmartStock-360#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@supabase/supabase-js": "^2.119.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.2"
+  }
+}

@@ -3,3 +3,11 @@
 Thumbs.db
 .vscode/
 .idea/
+
+node_modules/
+*.jks
+smartstock360-release*
+android/.gradle/
+android/local.properties
+android/app/build/
+*.apk
