@@ -46,6 +46,10 @@ function showConfirm(message,title='Confirmar ação'){
 function escapeHtml(value){
   return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
+function plural(qtd,singular,plural){
+  return Number(qtd)===1?singular:plural;
+}
+
 function fmtDate(dateStr){
   if(!dateStr)return '-';
   const [y,m,d]=dateStr.split('-');
@@ -67,8 +71,8 @@ function statusLote(loteOuValidade,quantidade){
   if(Number(qtd)===0)return{key:'zerado',label:'Sem estoque',dias:null};
   const dias=diasParaValidade(validade);
   if(dias<0)return{key:'vencido',label:'Vencido',dias};
-  if(dias<=7)return{key:'critico',label:dias===0?'Vence hoje':`${dias} dia${dias===1?'':'s'}`,dias};
-  if(dias<=30)return{key:'proximo',label:`${dias} dias`,dias};
+  if(dias<=7)return{key:'critico',label:dias===0?'Vence hoje':`Crítico — ${dias} ${dias===1?'dia':'dias'}`,dias};
+  if(dias<=30)return{key:'proximo',label:`Próximo — ${dias} dias`,dias};
   return{key:'ok',label:'Normal',dias};
 }
 function badge(lote){
@@ -230,7 +234,7 @@ function atualizarInfoSaida(){
   const total=lista.reduce((s,x)=>s+Number(x.quantidade),0);
   if(!lista.length){$('saidaEstoqueInfo').textContent='Produto sem estoque disponível.';return}
   const primeiro=lista[0];
-  $('saidaEstoqueInfo').textContent=`Estoque disponível: ${total} unidade(s). Primeiro lote FEFO: ${primeiro.numero_lote}, validade ${fmtDate(primeiro.validade)}.`;
+  $('saidaEstoqueInfo').textContent=`Estoque disponível: ${total} ${plural(total,'unidade','unidades')}. Primeiro lote FEFO: ${primeiro.numero_lote}, validade ${fmtDate(primeiro.validade)}.`;
 }
 $('produtoForm').addEventListener('submit',async e=>{
   e.preventDefault();
@@ -368,7 +372,7 @@ function validarCsvPreview(){
 function renderCsvPreview(){
   const validos=csvPreview.filter(x=>x.tipo==='ok');
   const erros=csvPreview.length-validos.length;
-  $('csvResumo').textContent=csvPreview.length?`${csvPreview.length} linha(s): ${validos.length} pronta(s) e ${erros} com problema(s).`:'Nenhum arquivo selecionado.';
+  $('csvResumo').textContent=csvPreview.length?`${csvPreview.length} ${plural(csvPreview.length,'linha','linhas')}: ${validos.length} ${plural(validos.length,'pronta','prontas')} e ${erros} ${plural(erros,'com problema','com problemas')}.`:'Nenhum arquivo selecionado.';
   $('processarCsvBtn').disabled=!validos.length;
   $('csvRows').innerHTML=csvPreview.length?csvPreview.map(x=>`<tr><td>${x.linha}</td><td>${escapeHtml(x.codigo)}</td><td>${escapeHtml(x.produto?.nome||'-')}</td><td>${Number.isFinite(x.quantidade)?x.quantidade:'-'}</td><td>${x.produto?x.estoque:'-'}</td><td class="csv-${x.tipo==='ok'?'ok':'erro'}">${escapeHtml(x.status)}</td></tr>`).join(''):emptyRow(6,'Selecione um arquivo CSV para visualizar a prévia.');
 }
@@ -384,7 +388,7 @@ $('csvArquivo').addEventListener('change',async e=>{
 $('processarCsvBtn').addEventListener('click',async()=>{
   const validos=csvPreview.filter(x=>x.tipo==='ok');
   if(!validos.length)return;
-  if(!await showConfirm(`Deseja processar ${validos.length} venda(s) válida(s)?`,`Confirmar importação`))return;
+  if(!await showConfirm(`Deseja processar ${validos.length} ${plural(validos.length,'venda válida','vendas válidas')}?`,`Confirmar importação`))return;
   $('processarCsvBtn').disabled=true;
   let sucesso=0;
   const falhas=[];
@@ -396,8 +400,8 @@ $('processarCsvBtn').addEventListener('click',async()=>{
   csvPreview=[];
   $('csvArquivo').value='';
   renderCsvPreview();
-  if(falhas.length)showAlert(`${sucesso} venda(s) processada(s). ${falhas.length} falharam. ${falhas[0]}`,'warning');
-  else showAlert(`${sucesso} venda(s) importada(s) e baixada(s) do estoque com sucesso.`);
+  if(falhas.length)showAlert(`${sucesso} ${plural(sucesso,'venda processada','vendas processadas')}. ${falhas.length} ${plural(falhas.length,'falhou','falharam')}. ${falhas[0]}`,'warning');
+  else showAlert(`${sucesso} ${plural(sucesso,'venda importada e baixada','vendas importadas e baixadas')} do estoque com sucesso.`);
 });
 $('baixarModeloCsv').addEventListener('click',()=>{
   baixarArquivo('modelo_vendas.csv','codigo_barras;quantidade\n7891234567890;2\n','text/csv;charset=utf-8');

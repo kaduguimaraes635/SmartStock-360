@@ -76,3 +76,50 @@
   }
 }
 
+
+/* Mensagens do sistema */
+.mensagem{
+  position:relative;
+  padding:13px 16px;
+  margin-bottom:18px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:600;
+  line-height:1.4;
+  border:1px solid transparent;
+  border-left-width:5px;
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+  animation:mensagemEntrada .2s ease-out;
+}
+
+.mensagem.success{
+  background:#edf8f1;
+  color:#17613a;
+  border-color:#b8dfc7;
+  border-left-color:#247047;
+}
+
+.mensagem.error{
+  background:#fff0f0;
+  color:#922121;
+  border-color:#edc2c2;
+  border-left-color:#bb2d2d;
+}
+
+.mensagem.warning{
+  background:#fff8e6;
+  color:#805500;
+  border-color:#ead69e;
+  border-left-color:#b47a00;
+}
+
+@keyframes mensagemEntrada{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
