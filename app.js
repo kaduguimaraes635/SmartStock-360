@@ -14,6 +14,35 @@ function showAlert(message,type='success'){
   clearTimeout(showAlert.timer);
   showAlert.timer=setTimeout(()=>el.classList.add('oculto'),5000);
 }
+function showConfirm(message,title='Confirmar ação'){
+  return new Promise(resolve=>{
+    const overlay=document.createElement('div');
+    overlay.className='modal-overlay';
+    overlay.innerHTML=`
+      <div class="modal-card">
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(message)}</p>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="modalCancel">Cancelar</button>
+          <button class="btn-primary" id="modalConfirm">Confirmar</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const close=result=>{
+      overlay.remove();
+      resolve(result);
+    };
+
+    overlay.querySelector('#modalCancel').onclick=()=>close(false);
+    overlay.querySelector('#modalConfirm').onclick=()=>close(true);
+    overlay.onclick=e=>{
+      if(e.target===overlay)close(false);
+    };
+  });
+}
+
 function escapeHtml(value){
   return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
@@ -229,7 +258,7 @@ $('produtosRows').addEventListener('click',async e=>{
     const p=produtos.find(x=>x.id===id);
     if(!p)return;
     const acao=ativo?'reativar':'arquivar';
-    if(!confirm(`Deseja ${acao} o produto "${p.nome}"?`))return;
+    if(!await showConfirm(`Deseja ${acao} o produto "${p.nome}"?`,`${ativo?'Reativar':'Arquivar'} produto`))return;
     const{error}=await sb.from('produtos').update({ativo}).eq('id',id);
     if(error){showAlert('Erro ao alterar o status do produto: '+error.message,'error');return}
     showAlert(`Produto ${ativo?'reativado':'arquivado'} com sucesso.`);
@@ -355,7 +384,7 @@ $('csvArquivo').addEventListener('change',async e=>{
 $('processarCsvBtn').addEventListener('click',async()=>{
   const validos=csvPreview.filter(x=>x.tipo==='ok');
   if(!validos.length)return;
-  if(!confirm(`Processar ${validos.length} venda(s) válida(s)?`))return;
+  if(!await showConfirm(`Deseja processar ${validos.length} venda(s) válida(s)?`,`Confirmar importação`))return;
   $('processarCsvBtn').disabled=true;
   let sucesso=0;
   const falhas=[];
